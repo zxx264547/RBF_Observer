@@ -12,7 +12,7 @@ alpha = 1;
 %% LMI设计
 P = sdpvar(2, 2, 'symmetric');
 
-K_values = -100:1:100;  % K的两个元素的范围
+K_values = -10:1:10;  % K的两个元素的范围
 found_solution = false;  % 标志位，判断是否找到解
 
 for k1 = K_values

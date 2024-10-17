@@ -15,7 +15,7 @@ A = [0, 1; -2, -3];
 B = [0; 1];
 C = [1, 0];
 K = [1; 1];
-P = [2.2761,0.2845;0.2845,0.5690];
+P = [-0.3794,-0.0474;-0.0474,-0.2371];
 % 初始化系统状态和观测器
 x = [0; 1]; % 初始系统状态
 x_hat = [0; 1]; % 初始观测器状态
@@ -189,7 +189,7 @@ plot(time, observation_x1(1:iteration), 'r');
 xlabel('t/s');
 ylabel('幅度');
 title('x1对比');
-legend('真实', '观测');
+legend('真实', 'x2误差');
 
 subplot(3, 1, 2);
 plot(time, true_x2(1:iteration), 'g');
@@ -198,7 +198,6 @@ plot(time, observation_x2(1:iteration), 'r');
 xlabel('t/s');
 ylabel('幅度');
 title('x2对比');
-legend('真实', '观测');
 
 subplot(3, 1, 3);
 plot(time, true_y(1:iteration), 'g');
@@ -207,7 +206,6 @@ plot(time, observation_y(1:iteration), 'r');
 xlabel('t/s');
 ylabel('幅度');
 title('y对比');
-legend('真实', '观测');
 
 disp('仿真完成');
 disp(['总共迭代次数: ', num2str(iteration)]);
