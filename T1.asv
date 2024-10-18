@@ -41,10 +41,10 @@ lambda2 = 0.03; % 学习率参数
 
 %% 仿真参数初始化
 % 设置仿真参数
-max_time = 20; % 仿真时间为10s
+t_end = 20; % 仿真时间为10s
 fault_time = 5; % 故障开始的时间为5s
 dt = 0.01; % 仿真时间步长为0.01s
-time = dt:dt:max_time; % 时间向量
+time = dt:dt:t_end; % 时间向量
 max_iterations = max_time / dt; % 总迭代次数
 iteration = 0; % 当前迭代次数
 
@@ -156,7 +156,7 @@ subplot(3, 1, 2);
 plot(time, observed_fault(1:iteration), 'b');
 xlabel('t/s');
 ylabel('幅度');
-title('故障信号');
+title('观测故障信号');
 
 subplot(3, 1, 3);
 plot(time, state_observation_error_x1(1:iteration), 'r', 'DisplayName', 'x1误差');
@@ -168,7 +168,7 @@ ylabel('幅度');
 title('状态的观测误差曲线');
 legend('x1误差', 'x2误差');
 
-figure;
+figure('Name',"真实值与观测值对比");
 subplot(3, 1, 1);
 plot(time, true_x1(1:iteration), 'g');
 hold on;
@@ -176,7 +176,7 @@ plot(time, observation_x1(1:iteration), 'r');
 xlabel('t/s');
 ylabel('幅度');
 title('x1对比');
-legend('真实', '观测');
+legend('真实x1', '观测x1');
 
 subplot(3, 1, 2);
 plot(time, true_x2(1:iteration), 'g');
@@ -185,7 +185,7 @@ plot(time, observation_x2(1:iteration), 'r');
 xlabel('t/s');
 ylabel('幅度');
 title('x2对比');
-legend('真实', '观测');
+legend('真实x2', '观测x2');
 
 subplot(3, 1, 3);
 plot(time, true_y(1:iteration), 'g');
@@ -194,7 +194,7 @@ plot(time, observation_y(1:iteration), 'r');
 xlabel('t/s');
 ylabel('幅度');
 title('y对比');
-legend('真实', '观测');
+legend('真实y', '观测y');
 
 disp('仿真完成');
 disp(['总共迭代次数: ', num2str(iteration)]);

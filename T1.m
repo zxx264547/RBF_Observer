@@ -41,12 +41,12 @@ lambda2 = 0.03; % 学习率参数
 
 %% 仿真参数初始化
 % 设置仿真参数
-max_time = 20; % 仿真时间为10s
+t_start = 0;
+t_end = 20; % 仿真时间,单位（s）
 fault_time = 5; % 故障开始的时间为5s
 dt = 0.01; % 仿真时间步长为0.01s
-time = dt:dt:max_time; % 时间向量
-max_iterations = max_time / dt; % 总迭代次数
-iteration = 0; % 当前迭代次数
+time = t_start:dt:t_end; % 时间向量
+max_iterations = length(time); % 总迭代次数
 
 % 数据记录
 true_fault = zeros(max_iterations, 1);
@@ -61,9 +61,9 @@ true_y = zeros(max_iterations, 1);
 observation_y = zeros(max_iterations, 1);
 
 %% 开始迭代
-while iteration < max_iterations
+for iteration = 1:max_iterations
     % 当前时刻
-    t = time(iteration + 1); 
+    t = time(iteration); 
     % 输入信号
     u = 0.5 * sin(2 * pi * t) + 0.5 * cos(0.008 * pi * t);
     % 不确定项
@@ -127,21 +127,17 @@ while iteration < max_iterations
     y_hat = C * x_hat; % 更新观测器输出
     
     %% 记录数据
-       
-    observed_fault(iteration + 1, 1) = theta_hat; % 记录观测到的故障信号
-    state_observation_error_x1(iteration + 1) = abs(x(1) - x_hat(1)); % 记录x1的观测误差
-    state_observation_error_x2(iteration + 1) = abs(x(2) - x_hat(2)); % 记录x2的观测误差
-    true_x1(iteration + 1) = x(1);
-    true_x2(iteration + 1) = x(2);
-    observation_x1(iteration + 1) = x_hat(1);
-    observation_x2(iteration + 1) = x_hat(2);
-    true_y(iteration + 1) = y;
-    observation_y(iteration + 1) = y_hat;
+    observed_fault(iteration, 1) = theta_hat; % 记录观测到的故障信号
+    state_observation_error_x1(iteration) = abs(x(1) - x_hat(1)); % 记录x1的观测误差
+    state_observation_error_x2(iteration) = abs(x(2) - x_hat(2)); % 记录x2的观测误差
+    true_x1(iteration) = x(1);
+    true_x2(iteration) = x(2);
+    observation_x1(iteration) = x_hat(1);
+    observation_x2(iteration) = x_hat(2);
+    true_y(iteration) = y;
+    observation_y(iteration) = y_hat;
     % 记录真实的故障输入
-    true_fault(iteration + 1) = theta;
-
-    %% 迭代次数增加
-    iteration = iteration + 1;
+    true_fault(iteration) = theta;
 end
 
 %% 绘制定理1故障观测结果和状态观测误差曲线
