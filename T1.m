@@ -1,16 +1,15 @@
 % MATLAB仿真代码：带不确定项和故障信号的系统故障检测
 
 % 初始化参数
-clear; clc; close all;
+clear;
 load optimal_fault_rbf_parameters.mat;
-load optimal_model_rbf_parameters.mat
-
+load optimal_model_rbf_parameters.mat;
+load resolve_K_P.mat;
+load system.mat;
 %% 系统参数初始化
 A = [0, 1; -2, -3];
 B = [0; 1];
 C = [1, 0];
-K = [1; 1];
-P = [2.2761,0.2845;0.2845,0.5690];
 Psi = [1; 1]; % 故障影响矩阵,维度为输入*故障信号维数
 
 % 初始化系统状态和观测器

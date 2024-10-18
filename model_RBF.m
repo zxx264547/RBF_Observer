@@ -1,5 +1,5 @@
 % RBF神经网络选择最优节点数量示例，并绘制损失曲线和拟合结果（多维输入）
-clear; clc; close all;
+clear;
 
 % 加载数据
 load('rbf_training_data.mat');

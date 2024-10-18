@@ -1,6 +1,6 @@
 % 初始化
-clear; clc;
-
+clear;
+load system.mat
 % 仿真时间设置
 t_start = 0; % 开始时间
 t_end = 100; % 结束时间
@@ -11,9 +11,7 @@ t = t_start:dt:t_end; % 时间向量
 x = zeros(length(t), 2); % 状态向量 [x1, x2]
 u = 0.5 * sin(2 * pi * t)' + 0.5 * cos(0.008 * pi * t)'; % 控制输入，随时间变化
 x(1, :) = [0, 0]; % 初始状态
-A = [0, 1; -2, -3];
-B = [0; 1];
-C = [1, 0];
+
 
 % 初始化故障信号
 theta = zeros(length(t), 1);
