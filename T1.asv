@@ -59,7 +59,7 @@ for iteration = 1:max_iterations
     % 当前时刻
     t = time(iteration); 
     % 输入信号
-    u = input(t);
+    u = 0.5 * sin(2 * pi * t) + 0.5 * cos(0.008 * pi * t);
     % 不确定项
     eta = uncertain(x);
     % 故障信号
@@ -129,41 +129,41 @@ end
 
 %% 绘制定理1故障观测结果和状态观测误差曲线
 figure('Name',"故障观测结果");
-subplot(2, 3, 1);
+subplot(3, 2, 1);
 plot(time, true_fault(1:iteration));
 xlabel('t/s');
 ylabel('幅度');
 title('真实故障信号');
 
-subplot(2, 3, 2);
+subplot(3, 2, 2);
 plot(time, observed_fault(1:iteration));
 xlabel('t/s');
 ylabel('幅度');
 title('观测故障信号');
 
-subplot(2, 3, 3);
+subplot(3, 2, 3);
 plot(time, true_fault(1:iteration)-observed_fault(1:iteration));
 xlabel('t/s');
 ylabel('幅度');
-title('故障误差');
+title('观测故障误差');
 
-subplot(2, 3, 4);
-plot(time, true_y(1:iteration));
+subplot(3, 2, 3);
+plot(time, true_fault(1:iteration)-observed_fault(1:iteration));
 xlabel('t/s');
 ylabel('幅度');
-title('真实输出误差');
+title('观测故障误差');
 
-subplot(2, 3, 5);
-plot(time, observation_y(1:iteration));
+subplot(3, 2, 3);
+plot(time, true_fault(1:iteration)-observed_fault(1:iteration));
 xlabel('t/s');
 ylabel('幅度');
-title('观测输出误差');
+title('观测故障误差');
 
-subplot(2, 3, 6);
-plot(time, true_y(1:iteration)-observation_y(1:iteration));
+subplot(3, 2, 3);
+plot(time, true_fault(1:iteration)-observed_fault(1:iteration));
 xlabel('t/s');
 ylabel('幅度');
-title('输出误差');
+title('观测故障误差');
 
 
 

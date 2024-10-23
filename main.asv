@@ -4,17 +4,17 @@ clc
 A = [-0.1, -0.1, -0.1, 0, 0;
 2*pi, 0, 0, 0, 0;
 0, 0, -3.3, 3.3, 0;
--1, 0, 0, -2.7, 0;
+-54, 0, 0, -2.7, 0;
 2, 0, 0, 0, 1];
-C = [2, 0, 0, 0, 1];
-B = [0; 0; 0; -2.7; 0];
+C = [2, 0, 0, 0, 0.1];
+
 % 状态维度
 state_dim = size(A,1);
 % 输入维度
 input_dim = size(C,1);
 save('system.mat', 'A', 'B', 'C', 'state_dim', 'input_dim');
 
-% resolve_K_P;
+resolve_K_P;
 data_generation;
 fault_RBF;
 model_RBF;
