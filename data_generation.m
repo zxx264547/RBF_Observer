@@ -11,13 +11,13 @@ max_iterations = length(time); % 总迭代次数
 % 初始化状态和控制输入
 
 
-x_all = zeros(length(time), state_dim);
-u_all = input(time); % 控制输入，随时间变化
+x_all = zeros(state_dim, length(time));
+u_all = sys_input(time); % 控制输入，随时间变化
 % 初始化故障信号
-theta_all = zeros(length(time), 1);
+theta_all = zeros(1, length(time));
 % 初始化记录线性部分和不确定项
-f_all = zeros(length(time), state_dim); 
-eta_all = zeros(length(time), state_dim);
+f_all = zeros(state_dim, length(time)); 
+eta_all = zeros(state_dim, length(time));
 
 % 进行仿真
 for iteration = 1:max_iterations
@@ -25,7 +25,7 @@ for iteration = 1:max_iterations
     t = time(iteration); 
     % 当前状态
     for i = 1:state_dim
-        x(i,1) = x_all(iteration,i);
+        x(i,1) = x_all(i, iteration);
     end
     for i = 1:input_dim
         u(i,1) = u_all(i, iteration);
@@ -36,15 +36,15 @@ for iteration = 1:max_iterations
     eta = uncertain(x);
     
     % 记录非线性部分和不确定项
-    f_all(iteration, :) = f;
-    eta_all(iteration, :) = eta;
+    f_all(:, iteration) = f;
+    eta_all(:, iteration) = eta;
     
     % 计算状态更新 (使用欧拉法)
     x_dot = f + eta + B * theta;
     
     % 更新状态
     if(iteration < max_iterations)
-        x_all(iteration+1, :) = x + x_dot * dt;
+        x_all(:, iteration+1) = x + x_dot * dt;
     end
 
 end
@@ -58,8 +58,8 @@ title('故障变化曲线');
 figure('Name','未知项')
 hold on; 
 % 循环遍历每个变量（每一列）
-for i = 1:size(eta_all,2)
-    plot(time, eta_all(:,i), 'DisplayName', ['x ', num2str(i)]);
+for i = 1:size(eta_all,1)
+    plot(time, eta_all(i, :), 'DisplayName', ['x ', num2str(i)]);
 end
 hold off;
 % 添加图例和标签
@@ -81,13 +81,13 @@ num_train = round(train_ratio * num_samples);
 indices = 1:num_samples;
 
 % 分割数据为训练集和测试集
-x_train = x_all(indices(1:num_train), :);
-y_train_model = y_model(indices(1:num_train), :);
-y_train_fault = y_fault(indices(1:num_train), :);
+x_train = x_all(indices(:, 1:num_train));
+y_train_model = y_model(:, indices(1:num_train));
+y_train_fault = y_fault(:, indices(1:num_train));
 
-x_test = x_all(indices(num_train+1:end), :);
-y_test_model = y_model(indices(num_train+1:end), :);
-y_test_fault = y_fault(indices(num_train+1:end), :);
+x_test = x_all(indices(:, num_train+1:end));
+y_test_model = y_model(:, indices(num_train+1:end));
+y_test_fault = y_fault(:, indices(num_train+1:end));
 
 
 % 保存数据到文件

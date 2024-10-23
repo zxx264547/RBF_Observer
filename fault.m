@@ -1,7 +1,7 @@
 function result = fault(x)
-    z = 0;
+    result = 2;
     for i = 1:size(x,1)
-        z = z + x(i);
+        result = result + 0.1 * sin(x(i));
     end
-    result = 1/(exp(-z) + 1);
+    
 end

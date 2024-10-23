@@ -59,7 +59,7 @@ for iteration = 1:max_iterations
     % 当前时刻
     t = time(iteration); 
     % 输入信号
-    u = input(t);
+    u = sys_input(t);
     % 不确定项
     eta = uncertain(x);
     % 故障信号
