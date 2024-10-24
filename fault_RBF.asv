@@ -6,7 +6,6 @@ load('rbf_training_data.mat'); % 假定此文件中包含变量 x_train 和 y_tr
 
 % 2. 设置交叉验证的相关参数
 max_centers = 50; % 最大节点数量，即径向基函数的中心数量
-min_centers = 5;
 num_folds = 5; % k折交叉验证的折数
 num_iterations = 100; % 每次训练的迭代次数
 learning_rate = 0.01; % 用于梯度下降的学习率
@@ -22,7 +21,7 @@ indices = crossvalind('Kfold', size(x_train, 1), num_folds); % 生成交叉验�
 validation_errors = zeros(max_centers, 1); % 保存验证误差
 loss_history_all = zeros(max_centers, num_iterations); % 保存损失历史
 
-for num_centers = min_centers:max_centers
+for num_centers = 1:max_centers
     fold_errors = zeros(num_folds, 1); % 保存每一折的误差
     loss_history = zeros(num_iterations, 1); % 记录损失随迭代变化
 
@@ -50,14 +49,14 @@ for num_centers = min_centers:max_centers
             end
             
             % 训练输出权重
-            weights = pinv(G_train) * y_train_fault_fold; % 使用伪逆求解权重
+            weights = y_train_fault_fold * pinv(G_train); % 使用伪逆求解权重
             
             % 验证集预测
             G_val = zeros(length(x_val_fold), num_centers);
             for i = 1:num_centers
                 G_val(:, i) = exp(-sum((x_val_fold - fault_centers(i, :)).^2, 2) / (2 * fault_sigma(i)^2));
             end
-            y_val_pred =  G_val * weights; % 预测验证集输出
+            y_val_pred = weights * G_val; % 预测验证集输出
             
             % 计算损失函数（均方误差）
             loss = mean((y_train_fault_fold - G_train * weights).^2, 'all');

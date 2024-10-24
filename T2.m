@@ -1,20 +1,17 @@
 % MATLAB仿真代码：带不确定项和故障信号的系统故障检测
 
 % 初始化参数
-clear;
-load optimal_fault_rbf_parameters.mat;
-load optimal_model_rbf_parameters.mat;
-load resolve_K_P.mat;
+% clear;
+load rbf_model_parameters.mat
+load KP_values.mat;
 load system.mat;
+% load KP_values.mat;
 %% 系统参数初始化
-A = [0, 1; -2, -3];
-B = [0; 1];
-C = [1, 0];
-Psi = [1; 1]; % 故障影响矩阵,维度为输入*故障信号维数
+Psi = B; % 故障影响矩阵,维度为输入*故障信号维数
 
 % 初始化系统状态和观测器
-x = [0; 1]; % 初始系统状态
-x_hat = [0; 1]; % 初始观测器状态
+x = zeros(state_dim, 1); % 初始系统状态
+x_hat = zeros(state_dim, 1); % 初始观测器状态
 y = C * x; % 系统输出
 y_hat = C * x_hat; % 观测器输出
 
@@ -29,12 +26,12 @@ fault_widths = fault_sigma;
 
 %% W更新自适应律初始化
 % 权值矩阵初始化
-W1 = zeros(2, model_num_neurons); 
-W2 = zeros(1, fault_num_neurons); 
+W1 = zeros(state_dim, model_num_neurons); 
+W2 = zeros(input_dim, fault_num_neurons); 
 
 % 自适应率的参数设置
-L1 = eye(2); 
-L2 = eye(1); 
+L1 = eye(state_dim); 
+L2 = eye(input_dim); 
 lambda1 = 0.03; % 学习率参数
 lambda2 = 0.03; % 学习率参数
 
@@ -50,12 +47,9 @@ max_iterations = length(time); % 总迭代次数
 % 数据记录
 true_fault = zeros(max_iterations, 1);
 observed_fault = zeros(max_iterations, 1);
-state_observation_error_x1 = zeros(max_iterations, 1);
-state_observation_error_x2 = zeros(max_iterations, 1);
-true_x1 = zeros(max_iterations, 1);
-true_x2 = zeros(max_iterations, 1);
-observation_x1 = zeros(max_iterations, 1);
-observation_x2 = zeros(max_iterations, 1);
+state_observation_error_x = zeros(state_dim, max_iterations);
+true_x = zeros(state_dim, max_iterations);
+observation_x = zeros(state_dim, max_iterations);
 true_y = zeros(max_iterations, 1);
 observation_y = zeros(max_iterations, 1);
 
@@ -64,13 +58,12 @@ for iteration = 1:max_iterations
     % 当前时刻
     t = time(iteration); 
     % 输入信号
-    u = 0.5 * sin(2 * pi * t) + 0.5 * cos(0.008 * pi * t);
+    u = sys_input(t);
     % 不确定项
-    eta1 = -sin(x(2)) - 0.1 * sin(x(1)) * cos(x(2));
-    eta2 = 0.1 * sin(x(1)) * cos(x(2));
+    eta = uncertain(x);
     % 故障信号
     if t >= fault_time
-        theta = 2 + x(2) / (x(1) +1) * sin(pi * t); % 故障信号
+        theta = fault(x);
     else
         theta = 0; % 无故障
     end
@@ -79,12 +72,10 @@ for iteration = 1:max_iterations
     %% 真实系统
     % 系统线性部分
     f = A * x + B * u;
-    f1 = f(1);
-    f2 = f(2);
+    
     
     % 系统状态方程
-    x_dot = [f1 + eta1 + Psi(1) * theta; 
-             f2 + eta2 + Psi(2) * theta];
+    x_dot = f + eta + Psi * theta;
     x = x + x_dot * dt; % 更新状态
     y = C * x; % 更新系统输出
 
@@ -110,7 +101,8 @@ for iteration = 1:max_iterations
         W2_dot = 0;
     else
         W2_dot = (L2 * Psi' * ((P * C') * y_epsilon) * phi2' - lambda2 * norm_y_epsilon_CP_Psi * L2 * W2) / (norm_C^2);
-    end        
+    end  
+    
     W1 = W1 + W1_dot * dt;
     W2 = W2 + W2_dot * dt;
 
@@ -129,70 +121,69 @@ for iteration = 1:max_iterations
     y_hat = C * x_hat; % 更新观测器输出
     
     %% 记录数据
+    true_fault(iteration) = theta;
     observed_fault(iteration, 1) = theta_hat; % 记录观测到的故障信号
-    state_observation_error_x1(iteration) = abs(x(1) - x_hat(1)); % 记录x1的观测误差
-    state_observation_error_x2(iteration) = abs(x(2) - x_hat(2)); % 记录x2的观测误差
-    true_x1(iteration) = x(1);
-    true_x2(iteration) = x(2);
-    observation_x1(iteration) = x_hat(1);
-    observation_x2(iteration) = x_hat(2);
+    state_observation_error_x(:,iteration) = abs(x - x_hat); 
+    true_x(:,iteration) = x;
+    observation_x(:,iteration) = x_hat;
     true_y(iteration) = y;
     observation_y(iteration) = y_hat;
-    % 记录真实的故障输入
-    true_fault(iteration) = theta;
 end
 
 %% 绘制定理1故障观测结果和状态观测误差曲线
-figure('Name',"故障观测结果和状态观测误差曲线");
-subplot(3, 1, 1);
-plot(time, true_fault(1:iteration), 'g');
-xlabel('t/s');
-ylabel('幅度');
-title('真实故障信号');
-
-subplot(3, 1, 2);
-plot(time, observed_fault(1:iteration), 'b');
-xlabel('t/s');
-ylabel('幅度');
-title('观测故障信号');
-
-subplot(3, 1, 3);
-plot(time, state_observation_error_x1(1:iteration), 'r', 'DisplayName', 'x1误差');
+figure('Name',"对比图");
+subplot(2, 2, 1);
+plot(time, true_fault(1:iteration),'DisplayName','真实故障');
 hold on;
-plot(time, state_observation_error_x2(1:iteration), 'b', 'DisplayName', 'x2误差');
-hold off;
+plot(time, observed_fault(1:iteration),'DisplayName','观测故障');
 xlabel('t/s');
 ylabel('幅度');
-title('状态的观测误差曲线');
-legend('x1误差', 'x2误差');
+title('故障信号对比');
+legend show;
 
-figure('Name',"真实值与观测值对比");
-subplot(3, 1, 1);
-plot(time, true_x1(1:iteration), 'g');
-hold on;
-plot(time, observation_x1(1:iteration), 'r');
+subplot(2, 2, 2);
+plot(time, true_fault(1:iteration)-observed_fault(1:iteration));
 xlabel('t/s');
 ylabel('幅度');
-title('x1对比');
-legend('真实x1', '观测x1');
+title('故障误差');
 
-subplot(3, 1, 2);
-plot(time, true_x2(1:iteration), 'g');
+subplot(2, 2, 3);
+plot(time, true_y(1:iteration),'DisplayName','真实输出');
 hold on;
-plot(time, observation_x2(1:iteration), 'r');
+plot(time, observation_y(1:iteration),'DisplayName','观测输出');
 xlabel('t/s');
 ylabel('幅度');
-title('x2对比');
-legend('真实x2', '观测x2');
+title('输出对比');
+legend show;
 
-subplot(3, 1, 3);
-plot(time, true_y(1:iteration), 'g');
-hold on;
-plot(time, observation_y(1:iteration), 'r');
+subplot(2, 2, 4);
+plot(time, true_y(1:iteration)-observation_y(1:iteration));
 xlabel('t/s');
 ylabel('幅度');
-title('y对比');
-legend('真实y', '观测y');
+title('输出误差');
+
+
+figure('Name',"状态真实值与观测值对比");
+for i = 1:state_dim
+    subplot(state_dim, 1, i);
+    plot(time, true_x(i, 1:iteration), 'g');
+    hold on;
+    plot(time, observation_x(i, 1:iteration), 'r');
+    xlabel('t/s');
+    ylabel('幅度');
+    title(sprintf('x%d对比', i));
+    legend(sprintf('真实x%d',i),sprintf('观测x%d',i));
+end
+
+figure('Name',"状态真实值与观测值误差");
+for i = 1:state_dim
+    subplot(state_dim, 1, i);
+    plot(time, state_observation_error_x(i, 1:iteration));
+    xlabel('t/s');
+    ylabel('幅度');
+    title(sprintf('x%d误差', i));
+end
 
 disp('仿真完成');
 disp(['总共迭代次数: ', num2str(iteration)]);
+     

@@ -2,8 +2,7 @@
 
 % 初始化参数
 % clear;
-load optimal_fault_rbf_parameters.mat;
-load optimal_model_rbf_parameters.mat;
+load rbf_model_parameters.mat
 load KP_values.mat;
 load system.mat;
 % load KP_values.mat;
@@ -128,54 +127,37 @@ for iteration = 1:max_iterations
 end
 
 %% 绘制定理1故障观测结果和状态观测误差曲线
-figure('Name',"故障观测结果");
-subplot(2, 3, 1);
-plot(time, true_fault(1:iteration));
+figure('Name',"对比图");
+subplot(2, 2, 1);
+plot(time, true_fault(1:iteration),'DisplayName','真实故障');
+hold on;
+plot(time, observed_fault(1:iteration),'DisplayName','观测故障');
 xlabel('t/s');
 ylabel('幅度');
-title('真实故障信号');
+title('故障信号对比');
+legend show;
 
-subplot(2, 3, 2);
-plot(time, observed_fault(1:iteration));
-xlabel('t/s');
-ylabel('幅度');
-title('观测故障信号');
-
-subplot(2, 3, 3);
+subplot(2, 2, 2);
 plot(time, true_fault(1:iteration)-observed_fault(1:iteration));
 xlabel('t/s');
 ylabel('幅度');
 title('故障误差');
 
-subplot(2, 3, 4);
-plot(time, true_y(1:iteration));
+subplot(2, 2, 3);
+plot(time, true_y(1:iteration),'DisplayName','真实输出');
+hold on;
+plot(time, observation_y(1:iteration),'DisplayName','观测输出');
 xlabel('t/s');
 ylabel('幅度');
-title('真实输出误差');
+title('输出对比');
+legend show;
 
-subplot(2, 3, 5);
-plot(time, observation_y(1:iteration));
-xlabel('t/s');
-ylabel('幅度');
-title('观测输出误差');
-
-subplot(2, 3, 6);
+subplot(2, 2, 4);
 plot(time, true_y(1:iteration)-observation_y(1:iteration));
 xlabel('t/s');
 ylabel('幅度');
 title('输出误差');
 
-
-
-% subplot(5, 1, 3);
-% plot(time, state_observation_error_x1(1:iteration), 'r', 'DisplayName', 'x1误差');
-% hold on;
-% plot(time, state_observation_error_x2(1:iteration), 'b', 'DisplayName', 'x2误差');
-% hold off;
-% xlabel('t/s');
-% ylabel('幅度');
-% title('状态的观测误差曲线');
-% legend('x1误差', 'x2误差');
 
 figure('Name',"状态真实值与观测值对比");
 for i = 1:state_dim
@@ -197,26 +179,6 @@ for i = 1:state_dim
     ylabel('幅度');
     title(sprintf('x%d误差', i));
 end
-% subplot(5, 1, 1);
-% 
-% 
-% subplot(5, 1, 2);
-% plot(time, true_x2(1:iteration), 'g');
-% hold on;
-% plot(time, observation_x2(1:iteration), 'r');
-% xlabel('t/s');
-% ylabel('幅度');
-% title('x2对比');
-% legend('真实x2', '观测x2');
-
-% subplot(3, 1, 3);
-% plot(time, true_y(1:iteration), 'g');
-% hold on;
-% plot(time, observation_y(1:iteration), 'r');
-% xlabel('t/s');
-% ylabel('幅度');
-% title('y对比');
-% legend('真实y', '观测y');
 
 disp('仿真完成');
 disp(['总共迭代次数: ', num2str(iteration)]);
