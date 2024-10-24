@@ -5,7 +5,6 @@
 load rbf_model_parameters.mat
 load KP_values.mat;
 load system.mat;
-% load KP_values.mat;
 %% 系统参数初始化
 Psi = B; % 故障影响矩阵,维度为输入*故障信号维数
 

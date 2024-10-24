@@ -38,7 +38,7 @@ lambda2 = 0.03; % 学习率参数
 %% 仿真参数初始化
 % 设置仿真参数
 t_start = 0;
-t_end = 20; % 仿真时间,单位（s）
+t_end = 25; % 仿真时间,单位（s）
 fault_time = 5; % 故障开始的时间为5s
 dt = 0.01; % 仿真时间步长为0.01s
 time = t_start:dt:t_end; % 时间向量
@@ -102,7 +102,7 @@ for iteration = 1:max_iterations
     else
         W2_dot = (L2 * Psi' * ((P * C') * y_epsilon) * phi2' - lambda2 * norm_y_epsilon_CP_Psi * L2 * W2) / (norm_C^2);
     end  
-    
+
     W1 = W1 + W1_dot * dt;
     W2 = W2 + W2_dot * dt;
 

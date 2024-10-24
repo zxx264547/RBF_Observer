@@ -42,8 +42,8 @@ save('rbf_model_parameters.mat', 'fault_centers', 'fault_sigma', "fault_weights_
     'model_centers', 'model_sigma', 'model_weights_optimal');
 
 %% 计算KP
-% resolve_K_P;
+resolve_KP;
 
 %% 观测器仿真
-T1;
-% T2;
+% T1;
+T2;
