@@ -36,8 +36,8 @@ data_generation;
 
 %% 训练模型
 load('rbf_training_data.mat');
-[fault_centers, fault_sigma, fault_weights_optimal] = rbf_train(x_all, y_model, 5, 100);
-[model_centers, model_sigma, model_weights_optimal] = rbf_train(x_all, y_fault, 5, 100);
+[fault_centers, fault_sigma, fault_weights_optimal] = rbf_train(x_all, y_model, 50, 200);
+[model_centers, model_sigma, model_weights_optimal] = rbf_train(x_all, y_fault, 50, 200);
 save('rbf_model_parameters.mat', 'fault_centers', 'fault_sigma', "fault_weights_optimal", ...
     'model_centers', 'model_sigma', 'model_weights_optimal');
 
